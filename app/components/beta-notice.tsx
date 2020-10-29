@@ -49,26 +49,33 @@ export const BetaNotice: FC = () => {
       bottom="base"
       flexDirection={['column', 'row']}
     >
-      <Text mr="base" onClick={openIssueLink} textDecoration="underline" cursor="pointer">
+      <Text mr="base-tight" onClick={openIssueLink} textDecoration="underline" cursor="pointer">
         Found a bug? Open an issue
       </Text>
       {pullRequest && branchName && (
-        <Text mr="base" onClick={openPullRequestLink} textDecoration="underline" cursor="pointer">
+        <Text
+          mr="base-tight"
+          onClick={openPullRequestLink}
+          textDecoration="underline"
+          cursor="pointer"
+        >
           {branchName}
         </Text>
       )}
-      <Text mr="base">
-        Commit:{' '}
-        <Text
-          cursor="pointer"
-          textDecoration="underline"
-          onClick={() =>
-            openExternalLink(`https://github.com/blockstack/stacks-wallet/commit/${sha || ''}`)
-          }
-        >
-          {shaShort}
+      {shaShort && (
+        <Text mr="base">
+          Commit:{' '}
+          <Text
+            cursor="pointer"
+            textDecoration="underline"
+            onClick={() =>
+              openExternalLink(`https://github.com/blockstack/stacks-wallet/commit/${sha || ''}`)
+            }
+          >
+            {shaShort}
+          </Text>
         </Text>
-      </Text>
+      )}
       <Text mr="base">[{packageJson.version}]</Text>
     </Flex>
   );

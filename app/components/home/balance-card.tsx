@@ -1,7 +1,7 @@
 import React, { FC, useState } from 'react';
 import { Box, Button, Text, ArrowIcon, EncryptionIcon, Flex } from '@blockstack/ui';
 
-import { features } from '@constants/index';
+import { features, NETWORK } from '@constants/index';
 import { toHumanReadableStx } from '@utils/unit-convert';
 import { safeAwait } from '@utils/safe-await';
 import { delay } from '@utils/delay';
@@ -12,7 +12,7 @@ interface BalanceCardProps {
   lockedStx?: string;
   onSelectSend(): void;
   onSelectReceive(): void;
-  onRequestTestnetStx(): Promise<any>;
+  onRequestTestnetStx({ stacking }: { stacking: boolean }): Promise<any>;
 }
 
 export const BalanceCard: FC<BalanceCardProps> = props => {
@@ -20,9 +20,15 @@ export const BalanceCard: FC<BalanceCardProps> = props => {
 
   const [requestingTestnetStx, setRequestingTestnetStx] = useState(false);
 
-  const requestTestnetStacks = async () => {
-    setRequestingTestnetStx(true);
-    await safeAwait(Promise.allSettled([onRequestTestnetStx(), delay(1500)]));
+  const requestTestnetStacks = async (e: React.MouseEvent) => {
+    if (NETWORK !== 'testnet') return;
+    if (e.nativeEvent) setRequestingTestnetStx(true);
+    const [error] = await safeAwait(
+      Promise.all([onRequestTestnetStx({ stacking: e.nativeEvent.altKey }), delay(1500)])
+    );
+    if (error) {
+      window.alert('Faucet request failed');
+    }
     setRequestingTestnetStx(false);
   };
 
@@ -57,18 +63,26 @@ export const BalanceCard: FC<BalanceCardProps> = props => {
           <ArrowIcon direction="down" mr="base-tight" />
           Receive
         </Button>
-        <Button mode="secondary" size="md" ml="tight" onClick={requestTestnetStacks}>
-          <Box
-            mr="extra-tight"
-            fontSize="18px"
-            left="-4px"
-            position="relative"
-            display={['none', 'none', 'block']}
+        {NETWORK === 'testnet' && (
+          <Button
+            mode="secondary"
+            size="md"
+            ml="tight"
+            isDisabled={requestingTestnetStx}
+            onClick={e => requestTestnetStacks(e)}
           >
-            🚰
-          </Box>
-          {requestingTestnetStx ? 'Requesting faucet' : 'Get testnet STX'}
-        </Button>
+            <Box
+              mr="extra-tight"
+              fontSize="18px"
+              left="-4px"
+              position="relative"
+              display={['none', 'none', 'block']}
+            >
+              🚰
+            </Box>
+            {requestingTestnetStx ? 'Requesting faucet' : 'Get testnet STX'}
+          </Button>
+        )}
       </Box>
     </Box>
   );

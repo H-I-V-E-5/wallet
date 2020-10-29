@@ -1,6 +1,6 @@
 name: Exact versions
 
-on: [push, pull_request]
+on: [push]
 
 jobs:
   check-versions:

@@ -1,6 +1,6 @@
 name: Commitlint
 
-on: [pull_request]
+on: [push]
 
 jobs:
   lint:
